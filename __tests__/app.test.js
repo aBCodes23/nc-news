@@ -13,6 +13,15 @@ beforeEach(() => {
 });
 
 describe("/api/topics", () => {
+    test('200: responds with an array of the correct length', () => {
+        return request(app)
+        .get('/api/topics')
+        .expect(200)
+        .then(({body})=>{
+            const {topics} = body
+            expect(topics.length).toBe(3)
+        })
+    })
   test("200: responds with topics", () => {
     return request(app)
       .get("/api/topics")
