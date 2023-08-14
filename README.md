@@ -2,10 +2,10 @@
 
 An .env file must be created for both the test and development databases.
 
-To ensure the right database is being accessed, declare an environment variable as below:
+Create a file called 'env.database' and add the line:
 
-const ENV = process.env.NODE_ENV || "[non-test databse]";
+PGDATABASE = nc_news
 
-Use dotenv to load the right database name (PGDATABASE) into the process.env object as below:
+Create a file called 'env.test' and add the line:
 
-require("dotenv").config({ path: `${__dirname}/../.env.${ENV}` })
+PGDATABASE = nc_new_test
