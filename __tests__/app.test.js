@@ -89,7 +89,7 @@ describe("/api/articles/:article_id", () => {
       });
   });
   test("200: returns an object with the correct properties for a random article", () => {
-    article_id = Math.floor(Math.random() * 13);
+    article_id = 1 + Math.floor(Math.random() * 12);
     return request(app)
       .get(`/api/articles/${article_id}`)
       .then(({ body }) => {
@@ -106,19 +106,46 @@ describe("/api/articles/:article_id", () => {
   });
   test("400: returns a custom error when given a non-numeric article_id", () => {
     return request(app)
-      .get('/api/articles/article4')
+      .get("/api/articles/article4")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('Bad Request: path is invalid');
+        expect(body.msg).toBe("Bad Request: path is invalid");
       });
   });
   test("404: returns an error when given a numeric article_id that doesn't exist", () => {
     return request(app)
-      .get('/api/articles/14340975')
+      .get("/api/articles/14340975")
       .expect(404)
       .then(({ body }) => {
-        const {msg} = body
-        expect(msg).toBe('Bad Request: Article does not exist');
+        const { msg } = body;
+        expect(msg).toBe("Bad Request: Article does not exist");
+      });
+  });
+});
+
+describe("/api/articles", () => {
+  test("200: returns an array of article objects with the correct properties", () => {
+    const desiredArticle = {
+      author: expect.any(String),
+      title: expect.any(String),
+      article_id: expect.any(Number),
+      topic: expect.any(String),
+      created_at: expect.any(String),
+      votes: expect.any(Number),
+      article_img_url: expect.any(String),
+      comment_count: expect.any(String),
+    };
+
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(13);
+        expect(articles).toBeSortedBy('created_at', {descending: true})
+        articles.forEach((article) => {
+          expect(article).toMatchObject(desiredArticle)
+        });
       });
   });
 });
