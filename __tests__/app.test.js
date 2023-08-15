@@ -142,10 +142,52 @@ describe("/api/articles", () => {
       .then(({ body }) => {
         const { articles } = body;
         expect(articles.length).toBe(13);
-        expect(articles).toBeSortedBy('created_at', {descending: true})
+        expect(articles).toBeSortedBy("created_at", { descending: true });
         articles.forEach((article) => {
-          expect(article).toMatchObject(desiredArticle)
+          expect(article).toMatchObject(desiredArticle);
         });
       });
   });
+});
+
+describe("/api/articles/:article_id/comments", () => {
+  test("200: returns with an empty array if an article has no comments", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toEqual([]);
+      });
+  });
+  test("200: returns with an array of comments", () => {
+    const desiredComment = {
+      comment_id: expect.any(Number),
+      votes: expect.any(Number),
+      created_at: expect.any(String),
+      author: expect.any(String),
+      body: expect.any(String),
+      article_id: expect.any(Number),
+    };
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments.length).toEqual(11);
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject(desiredComment);
+        });
+      });
+  });
+  test("404: returns an error when given a numeric article_id that doesn't exist", () => {
+    return request(app)
+    .get("/api/articles/193476/comments")
+    .expect(404)
+    .then(({ body }) => {
+      const { msg } = body;
+      expect(msg).toBe("Bad Request: Article does not exist");
+    });
+  })
 });
