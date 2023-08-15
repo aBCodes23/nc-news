@@ -57,8 +57,69 @@ describe("/api", () => {
       .get("/api")
       .then(({ body }) => {
         const { endpoints } = body;
-        console.log(localEndPointsJSON)
-        expect(endpoints).toEqual(localEndPointsJSON)
+        expect(endpoints).toEqual(localEndPointsJSON);
+      });
+  });
+});
+
+describe("/api/articles/:article_id", () => {
+  test("200: returns an article object with the correct properties for a specific article_id", () => {
+    return request(app)
+      .get("/api/articles/4")
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toHaveProperty("author", "rogersop");
+        expect(article).toHaveProperty("title", "Student SUES Mitch!");
+        expect(article).toHaveProperty("article_id", 4);
+        expect(article).toHaveProperty(
+          "body",
+          "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages"
+        );
+        expect(article).toHaveProperty("topic", "mitch");
+        expect(article).toHaveProperty(
+          "created_at",
+          "2020-05-06T01:14:00.000Z"
+        );
+        expect(article).toHaveProperty("votes", 0);
+        expect(article).toHaveProperty(
+          "article_img_url",
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        );
+      });
+  });
+  test("200: returns an object with the correct properties for a random article", () => {
+    article_id = Math.floor(Math.random() * 13);
+    return request(app)
+      .get(`/api/articles/${article_id}`)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toHaveProperty("author", expect.any(String));
+        expect(article).toHaveProperty("title", expect.any(String));
+        expect(article).toHaveProperty("article_id", expect.any(Number));
+        expect(article).toHaveProperty("body", expect.any(String));
+        expect(article).toHaveProperty("topic", expect.any(String));
+        expect(article).toHaveProperty("created_at", expect.any(String));
+        expect(article).toHaveProperty("votes", expect.any(Number));
+        expect(article).toHaveProperty("article_img_url", expect.any(String));
+      });
+  });
+  test("400: returns a custom error when given a non-numeric article_id", () => {
+    return request(app)
+      .get('/api/articles/article4')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request: article_id is not a number');
+      });
+  });
+  test("404: returns an error when given a numeric article_id that doesn't exist", () => {
+    return request(app)
+      .get('/api/articles/14')
+      .expect(404)
+      .then(({ body }) => {
+        const {msg} = body
+        console.log(msg)
+        expect(msg).toBe('Bad Request: Article does not exist');
       });
   });
 });
