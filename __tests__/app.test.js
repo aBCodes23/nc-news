@@ -109,16 +109,15 @@ describe("/api/articles/:article_id", () => {
       .get('/api/articles/article4')
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('Bad Request: article_id is not a number');
+        expect(body.msg).toBe('Bad Request: path is invalid');
       });
   });
   test("404: returns an error when given a numeric article_id that doesn't exist", () => {
     return request(app)
-      .get('/api/articles/14')
+      .get('/api/articles/14340975')
       .expect(404)
       .then(({ body }) => {
         const {msg} = body
-        console.log(msg)
         expect(msg).toBe('Bad Request: Article does not exist');
       });
   });

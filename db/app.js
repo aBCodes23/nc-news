@@ -15,6 +15,7 @@ app.get("/api/articles/:article_id", getArticles);
 app.use(customErrorHandler)
 
 app.use((err, req, res, next) => {
+    console.log(err)
     res.status(500).send({msg: 'Bad Request'})
 })
 
