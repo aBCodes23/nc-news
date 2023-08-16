@@ -104,7 +104,7 @@ describe("/api/articles/:article_id", () => {
         expect(article).toHaveProperty("article_img_url", expect.any(String));
       });
   });
-  test("400: returns a custom error when given a non-numeric article_id", () => {
+  test("400: returns an error when given a non-numeric article_id", () => {
     return request(app)
       .get("/api/articles/article4")
       .expect(400)
@@ -181,6 +181,14 @@ describe("/api/articles/:article_id/comments", () => {
         });
       });
   });
+  test('400: returns an error when given a non-numeric article_id', () => {
+    return request(app)
+    .get('/api/articles/article4/comments')
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe("Bad Request: path is invalid")
+    })
+  })
   test("404: returns an error when given a numeric article_id that doesn't exist", () => {
     return request(app)
     .get("/api/articles/193476/comments")
