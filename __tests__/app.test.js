@@ -201,10 +201,11 @@ describe("GET /api/articles/:article_id/comments", () => {
 });
 
 describe("POST /api/articles/:article_id/comments", () => {
-  test("201: adds a new comment to the table and responds with the comment", () => {
+  test("201: adds a new comment to the table and responds with the comment, whilst ignoring unnecessary properties", () => {
     const newComment = {
       body: "Comment McCommentface",
       username: "butter_bridge",
+      irrelevant: "property"
     };
     
     const desiredReturnedComment = {
@@ -251,6 +252,21 @@ describe("POST /api/articles/:article_id/comments", () => {
     .then(({body}) => {
       const {msg} = body
       expect(msg).toBe('Bad Request: Article_id invalid')
+    })
+  });
+  test("404: Not Found - Returns with an error when trying to add a comment by a user that doesn't exist", () => {
+    const newComment = {
+      body: "Comment McCommentface",
+      username: "SirCommentsALot",
+    };
+
+    return request(app)
+    .post("/api/articles/1/comments")
+    .send(newComment)
+    .expect(404)
+    .then(({body}) => {
+      const {msg} = body
+      expect(msg).toBe('Not Found: User does not exist')
     })
   });
   test("404: Not Found - Returns a custom error when given a numeric article_id that doesn't exist", () => {

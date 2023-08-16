@@ -3,10 +3,14 @@ const {
   addComment,
 } = require("../models/comments.models");
 const { checkArticleExists } = require("../models/articles.models");
+const { checkUserExists } = require("../models/users.models");
 
 exports.getArticleComments = (request, response, next) => {
   const { article_id } = request.params;
-  const promises = [checkArticleExists(article_id), readArticleComments(article_id)];
+  const promises = [
+    checkArticleExists(article_id),
+    readArticleComments(article_id),
+  ];
 
   Promise.all(promises)
     .then((resolvedPromises) => {
@@ -20,12 +24,17 @@ exports.getArticleComments = (request, response, next) => {
 
 exports.postComment = (request, response, next) => {
   const { article_id } = request.params;
-  const  newComment  = request.body;
-  const promises = [checkArticleExists(article_id),addComment(article_id, newComment)];
+  const newComment = request.body;
+  const { username } = newComment;
+  const promises = [
+    checkUserExists(username),
+    checkArticleExists(article_id),
+    addComment(article_id, newComment),
+  ];
 
   Promise.all(promises)
     .then((resolvedPromises) => {
-      const comment = resolvedPromises[1];
+      const comment = resolvedPromises[2];
       response.status(201).send({ comment });
     })
     .catch((err) => {
