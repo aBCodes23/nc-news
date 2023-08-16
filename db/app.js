@@ -6,8 +6,10 @@ const {
   getArticle,
   getArticles,
 } = require("../controllers/articles.controllers");
+const { getArticleComments, postComment } = require("../controllers/comments.controllers");
 const { customErrorHandler } = require("../controllers/errors.controllers");
-const { getArticleComments } = require("../controllers/comments.controllers");
+
+app.use(express.json());
 
 app.get("/api/topics", getTopics);
 
@@ -18,6 +20,8 @@ app.get("/api/articles/:article_id", getArticle);
 app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id/comments", getArticleComments);
+
+app.post('/api/articles/:article_id/comments', postComment)
 
 app.use(customErrorHandler);
 

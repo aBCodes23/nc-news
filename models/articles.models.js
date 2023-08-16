@@ -7,7 +7,7 @@ exports.checkArticleExists = (article_id) => {
       if (!rows.length) {
         return Promise.reject({
           status: 404,
-          msg: "Bad Request: Article does not exist",
+          msg: "Not Found: Article does not exist",
         });
       }
     });
