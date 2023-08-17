@@ -254,7 +254,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(msg).toBe('Bad Request: "article4" is invalid');
       });
   });
-  test("404: Not Found - Returns with an error when trying to add a comment by a user that doesn't exist", () => {
+  test("400: Bad Request - Returns with an error when trying to add a comment by a user that doesn't exist", () => {
     const newComment = {
       body: "Comment McCommentface",
       username: "SirCommentsALot",
@@ -263,10 +263,10 @@ describe("POST /api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send(newComment)
-      .expect(404)
+      .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Not Found: User does not exist");
+        expect(msg).toBe("Bad Request: User does not exist");
       });
   });
   test("404: Not Found - Returns a custom error when given a numeric article_id that doesn't exist", () => {
