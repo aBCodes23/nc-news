@@ -2,6 +2,7 @@ const {
   checkArticleExists,
   readArticle,
   readArticles,
+  updateArticleVotes
 } = require("../models/articles.models");
 
 exports.getArticle = (request, response, next) => {
@@ -34,6 +35,25 @@ exports.getArticles = (request, response, next) => {
     .then((resolvedPromises) => {
       const articles = resolvedPromises[0];
       response.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err)
+    });
+};
+
+exports.patchArticle = (request, response, next) => {
+  const { article_id } = request.params;
+  const articleUpdate = request.body
+  const promises = [checkArticleExists(article_id)];
+
+  if (articleUpdate['inc_vote']){
+    promises.push(updateArticleVotes(article_id, articleUpdate['inc_vote']))
+  }
+
+  Promise.all(promises)
+    .then((resolvedPromises) => {
+      const article = resolvedPromises[1];
+      response.status(200).send({ article });
     })
     .catch((err) => {
       next(err)
