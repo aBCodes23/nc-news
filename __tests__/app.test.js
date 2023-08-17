@@ -370,27 +370,46 @@ describe("DELETE /api/comments/:comment_id", () => {
       .expect(204)
       .then((body) => {
         return connection
-        .query ("SELECT * FROM comments WHERE comment_id = 1")
-        .then(({rows}) => {
-          expect(rows.length).toBe(0)
-        })
+          .query("SELECT * FROM comments WHERE comment_id = 1")
+          .then(({ rows }) => {
+            expect(rows.length).toBe(0);
+          });
       });
-
   });
   test("400: Bad Request - comment_id is invalid", () => {
     return request(app)
-    .delete("/api/comments/comment1")
-    .expect(400)
-    .then(({body}) => {
-      expect(body.msg).toBe('Bad Request: "comment1" is invalid')
-    })
+      .delete("/api/comments/comment1")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request: "comment1" is invalid');
+      });
   });
   test("404: Not Found - Comment doesnt exist", () => {
     return request(app)
-    .delete("/api/comments/9000")
-    .expect(404)
-    .then(({body}) => {
-      expect(body.msg).toBe('Not Found: Comment does not exist')
-    })
+      .delete("/api/comments/9000")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found: Comment does not exist");
+      });
+  });
+});
+
+describe("GET /api/users", () => {
+  test("200: Responds with user array of correct length", () => {
+    const userObject = {
+      username: expect.any(String),
+      name: expect.any(String),
+      avatar_url: expect.any(String)
+    };
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users.length).toBe(4);
+        users.forEach((user) => {
+          expect(user).toMatchObject(userObject);
+        });
+      });
   });
 });

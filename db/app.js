@@ -8,6 +8,7 @@ const {
   patchArticle
 } = require("../controllers/articles.controllers");
 const { getArticleComments, postComment, deleteComment } = require("../controllers/comments.controllers");
+const {getUsers} = require('../controllers/users.controllers')
 const { customErrorHandler } = require("../controllers/errors.controllers");
 
 app.use(express.json());
@@ -21,6 +22,8 @@ app.get("/api/articles/:article_id", getArticle);
 app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id/comments", getArticleComments);
+
+app.get('/api/users', getUsers)
 
 app.post('/api/articles/:article_id/comments', postComment)
 
