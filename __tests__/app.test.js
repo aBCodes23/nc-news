@@ -109,7 +109,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/article4")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Bad Request: \"article4\" is invalid");
+        expect(body.msg).toBe('Bad Request: "article4" is invalid');
       });
   });
   test("404: returns an error when given a numeric article_id that doesn't exist", () => {
@@ -186,7 +186,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/article4/comments")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Bad Request: \"article4\" is invalid");
+        expect(body.msg).toBe('Bad Request: "article4" is invalid');
       });
   });
   test("404: returns an error when given a numeric article_id that doesn't exist", () => {
@@ -251,7 +251,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad Request: \"article4\" is invalid");
+        expect(msg).toBe('Bad Request: "article4" is invalid');
       });
   });
   test("404: Not Found - Returns with an error when trying to add a comment by a user that doesn't exist", () => {
@@ -311,13 +311,24 @@ describe("PATCH /api/articles/:article_id", () => {
   });
   test("200: updates article votes (-), responds with the updated article, ignores other properties", () => {
     const newVotes = { inc_vote: -100 };
+    const desiredArticle = {
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      created_at: expect.any(String),
+      votes: 0,
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+      article_id: 1,
+    };
     return request(app)
-      .patch("/api/articles/2")
+      .patch("/api/articles/1")
       .send(newVotes)
       .expect(200)
       .then(({ body }) => {
         const { article } = body;
-        expect();
+        expect(article).toMatchObject(desiredArticle);
       });
   });
   test("400: Bad Request - Returns an error when votes is invalid data type", () => {
@@ -327,7 +338,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(newVotes)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Bad Request: \"pie\" is invalid");
+        expect(body.msg).toBe('Bad Request: "pie" is invalid');
       });
   });
   test("400: Bad Request - Returns an error when article_id is invalid data type", () => {
@@ -337,7 +348,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(newVotes)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Bad Request: \"article1\" is invalid");
+        expect(body.msg).toBe('Bad Request: "article1" is invalid');
       });
   });
   test("404: Not Found - Returns a custom error when given a numeric article_id that doesnt exit", () => {
