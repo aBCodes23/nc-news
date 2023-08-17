@@ -23,7 +23,6 @@ return db
 }
 
 exports.checkCommentExists = (comment_id) => {
-  console.log('in check comment exists')
   return db
   .query('SELECT * FROM comments WHERE comment_id = $1', [comment_id])
   .then(({rows}) => {
@@ -37,7 +36,6 @@ exports.checkCommentExists = (comment_id) => {
 }
 
 exports.deleteCommentdb = (comment_id) => {
-  console.log('in delete comment')
 return db
 .query("DELETE FROM comments WHERE comment_id = $1", [comment_id])
 .then(({rows})=>{
