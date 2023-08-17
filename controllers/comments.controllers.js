@@ -5,7 +5,7 @@ const {
   deleteCommentdb,
 } = require("../models/comments.models");
 const { checkArticleExists } = require("../models/articles.models");
-// const { checkUserExists } = require("../models/users.models");
+
 
 exports.getArticleComments = (request, response, next) => {
   const { article_id } = request.params;
