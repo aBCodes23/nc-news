@@ -13,7 +13,7 @@ beforeEach(() => {
   return seed(data);
 });
 
-describe("/api/topics", () => {
+describe("GET /api/topics", () => {
   test("200: responds with an array of the correct length", () => {
     return request(app)
       .get("/api/topics")
@@ -37,7 +37,7 @@ describe("/api/topics", () => {
   });
 });
 
-describe("/api", () => {
+describe("GET /api", () => {
   test("200: responds with object describing all available end points", () => {
     return request(app)
       .get("/api")
@@ -62,7 +62,7 @@ describe("/api", () => {
   });
 });
 
-describe("/api/articles/:article_id", () => {
+describe("GET /api/articles/:article_id", () => {
   test("200: returns an article object with the correct properties for a specific article_id", () => {
     return request(app)
       .get("/api/articles/4")
@@ -109,7 +109,7 @@ describe("/api/articles/:article_id", () => {
       .get("/api/articles/article4")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Bad Request: path is invalid");
+        expect(body.msg).toBe("Bad Request: Article_id invalid");
       });
   });
   test("404: returns an error when given a numeric article_id that doesn't exist", () => {
@@ -118,12 +118,12 @@ describe("/api/articles/:article_id", () => {
       .expect(404)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad Request: Article does not exist");
+        expect(msg).toBe("Not Found: Article does not exist");
       });
   });
 });
 
-describe("/api/articles", () => {
+describe("GET /api/articles", () => {
   test("200: returns an array of article objects with the correct properties", () => {
     const desiredArticle = {
       author: expect.any(String),
@@ -150,7 +150,7 @@ describe("/api/articles", () => {
   });
 });
 
-describe("/api/articles/:article_id/comments", () => {
+describe("GET /api/articles/:article_id/comments", () => {
   test("200: returns with an empty array if an article has no comments", () => {
     return request(app)
       .get("/api/articles/2/comments")
@@ -181,21 +181,107 @@ describe("/api/articles/:article_id/comments", () => {
         });
       });
   });
-  test('400: returns an error when given a non-numeric article_id', () => {
+  test("400: returns an error when given a non-numeric article_id", () => {
     return request(app)
-    .get('/api/articles/article4/comments')
-    .expect(400)
-    .then(({body}) => {
-      expect(body.msg).toBe("Bad Request: path is invalid")
-    })
-  })
+      .get("/api/articles/article4/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request: Article_id invalid");
+      });
+  });
   test("404: returns an error when given a numeric article_id that doesn't exist", () => {
     return request(app)
-    .get("/api/articles/193476/comments")
+      .get("/api/articles/193476/comments")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Not Found: Article does not exist");
+      });
+  });
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: adds a new comment to the table and responds with the comment, whilst ignoring unnecessary properties", () => {
+    const newComment = {
+      body: "Comment McCommentface",
+      username: "butter_bridge",
+      irrelevant: "property"
+    };
+    
+    const desiredReturnedComment = {
+      body: "Comment McCommentface",
+      votes: 0,
+      author: "butter_bridge",
+      article_id: 1,
+      created_at: expect.any(String),
+      comment_id: 19
+    };
+
+    return request(app)
+    .post("/api/articles/1/comments")
+    .send(newComment)
+    .expect(201)
+    .then(({body}) => {
+      const {comment} = body
+      expect(comment).toMatchObject(desiredReturnedComment)
+    })
+  });
+  test("400: Bad Request - Returns with an error when given an incomplete or invalid comment to post", () => {
+    const newComment = {
+      username: "butter_bridge",
+    };
+    return request(app)
+    .post("/api/articles/1/comments")
+    .send(newComment)
+    .expect(400)
+    .then(({body}) => {
+      const {msg} = body
+      expect(msg).toBe('Bad Request: Comment incomplete')
+    })
+  });
+  test("400: Bad Request - Returns with an error when trying to add a comment to an article that doesn't exist", () => {
+    const newComment = {
+      body: "Comment McCommentface",
+      username: "butter_bridge",
+    };
+
+    return request(app)
+    .post("/api/articles/article4/comments")
+    .send(newComment)
+    .expect(400)
+    .then(({body}) => {
+      const {msg} = body
+      expect(msg).toBe('Bad Request: Article_id invalid')
+    })
+  });
+  test("404: Not Found - Returns with an error when trying to add a comment by a user that doesn't exist", () => {
+    const newComment = {
+      body: "Comment McCommentface",
+      username: "SirCommentsALot",
+    };
+
+    return request(app)
+    .post("/api/articles/1/comments")
+    .send(newComment)
     .expect(404)
-    .then(({ body }) => {
-      const { msg } = body;
-      expect(msg).toBe("Bad Request: Article does not exist");
-    });
+    .then(({body}) => {
+      const {msg} = body
+      expect(msg).toBe('Not Found: User does not exist')
+    })
+  });
+  test("404: Not Found - Returns a custom error when given a numeric article_id that doesn't exist", () => {
+    const newComment = {
+      body: "Comment McCommentface",
+      username: "butter_bridge",
+    };
+
+    return request(app)
+    .post("/api/articles/9000/comments")
+    .send(newComment)
+    .expect(404)
+    .then(({body}) => {
+      const {msg} = body
+      expect(msg).toBe('Not Found: Article does not exist')
+    })
   })
 });
