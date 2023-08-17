@@ -5,6 +5,7 @@ const { getEndPoints } = require("../controllers/endpoint.controllers");
 const {
   getArticle,
   getArticles,
+  patchArticle
 } = require("../controllers/articles.controllers");
 const { getArticleComments, postComment } = require("../controllers/comments.controllers");
 const { customErrorHandler } = require("../controllers/errors.controllers");
@@ -23,10 +24,12 @@ app.get("/api/articles/:article_id/comments", getArticleComments);
 
 app.post('/api/articles/:article_id/comments', postComment)
 
+app.patch('/api/articles/:article_id', patchArticle)
+
 app.use(customErrorHandler);
 
 app.use((err, req, res, next) => {
-  console.log(err, "err in 500");
+  console.log(err, 'err in 500')
   res.status(500).send({ msg: "Bad Request" });
 });
 
