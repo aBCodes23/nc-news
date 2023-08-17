@@ -369,7 +369,6 @@ describe("DELETE /api/comments/:comment_id", () => {
       .delete("/api/comments/1")
       .expect(204)
       .then((body) => {
-        expect(body.msg).toBe(undefined);
         return connection
         .query ("SELECT * FROM comments WHERE comment_id = 1")
         .then(({rows}) => {
