@@ -21,3 +21,26 @@ return db
   return rows[0]
 })
 }
+
+exports.checkCommentExists = (comment_id) => {
+  console.log('in check comment exists')
+  return db
+  .query('SELECT * FROM comments WHERE comment_id = $1', [comment_id])
+  .then(({rows}) => {
+    if (!rows.length){
+      return Promise.reject({
+        status:404,
+        msg:'Not Found: Comment does not exist'
+      })
+    }
+  })
+}
+
+exports.deleteCommentdb = (comment_id) => {
+  console.log('in delete comment')
+return db
+.query("DELETE FROM comments WHERE comment_id = $1", [comment_id])
+.then(({rows})=>{
+  return rows
+})
+}

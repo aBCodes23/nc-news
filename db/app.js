@@ -7,7 +7,7 @@ const {
   getArticles,
   patchArticle
 } = require("../controllers/articles.controllers");
-const { getArticleComments, postComment } = require("../controllers/comments.controllers");
+const { getArticleComments, postComment, deleteComment } = require("../controllers/comments.controllers");
 const { customErrorHandler } = require("../controllers/errors.controllers");
 
 app.use(express.json());
@@ -25,6 +25,8 @@ app.get("/api/articles/:article_id/comments", getArticleComments);
 app.post('/api/articles/:article_id/comments', postComment)
 
 app.patch('/api/articles/:article_id', patchArticle)
+
+app.delete('/api/comments/:comment_id', deleteComment)
 
 app.use(customErrorHandler);
 
