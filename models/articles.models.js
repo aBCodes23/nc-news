@@ -1,6 +1,5 @@
 const db = require("../db/connection");
 
-
 exports.checkArticleExists = (article_id) => {
   return db
     .query("SELECT * FROM articles WHERE article_id = $1", [article_id])
@@ -16,7 +15,10 @@ exports.checkArticleExists = (article_id) => {
 
 exports.readArticle = (article_id) => {
   return db
-    .query("SELECT * FROM articles WHERE article_id = $1", [article_id])
+    .query(
+      "SELECT articles.body, articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id",
+      [article_id]
+    )
     .then(({ rows }) => {
       return rows[0];
     });
@@ -32,7 +34,7 @@ exports.readArticles = (topic, sort_by = "created_at", order = "DESC") => {
     "author",
     "body",
     "votes",
-    "comment_count"
+    "comment_count",
   ];
 
   if (!orderByGreenList.includes(order)) {
@@ -56,13 +58,13 @@ exports.readArticles = (topic, sort_by = "created_at", order = "DESC") => {
     sqlQuerystring += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`;
     return db.query(sqlQuerystring, [topic]).then(({ rows }) => {
       return rows;
-    })
+    });
   } else
     sqlQuerystring += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`;
 
   return db.query(sqlQuerystring).then(({ rows }) => {
     return rows;
-  })
+  });
 };
 
 exports.updateArticleVotes = (article_id, voteInc) => {

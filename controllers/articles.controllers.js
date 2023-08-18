@@ -17,6 +17,7 @@ exports.getArticle = (request, response, next) => {
   Promise.all(promises)
     .then((resolvedPromises) => {
       const article = resolvedPromises[0];
+      console.log(article)
       response.status(200).send({ article });
     })
     .catch((err) => {

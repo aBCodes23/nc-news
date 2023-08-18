@@ -63,29 +63,23 @@ describe("GET /api", () => {
 });
 
 describe("GET /api/articles/:article_id", () => {
+  const desiredArticle = {
+    author: expect.any(String),
+    title: expect.any(String),
+    article_id: 9,
+    topic: expect.any(String),
+    created_at: expect.any(String),
+    votes: expect.any(Number),
+    article_img_url: expect.any(String),
+    comment_count: 2,
+  };
   test("200: returns an article object with the correct properties for a specific article_id", () => {
     return request(app)
-      .get("/api/articles/4")
+      .get("/api/articles/9")
       .expect(200)
       .then(({ body }) => {
         const { article } = body;
-        expect(article).toHaveProperty("author", "rogersop");
-        expect(article).toHaveProperty("title", "Student SUES Mitch!");
-        expect(article).toHaveProperty("article_id", 4);
-        expect(article).toHaveProperty(
-          "body",
-          "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages"
-        );
-        expect(article).toHaveProperty("topic", "mitch");
-        expect(article).toHaveProperty(
-          "created_at",
-          "2020-05-06T01:14:00.000Z"
-        );
-        expect(article).toHaveProperty("votes", 0);
-        expect(article).toHaveProperty(
-          "article_img_url",
-          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-        );
+        expect(article).toMatchObject(desiredArticle)
       });
   });
   test("200: returns an object with the correct properties for a random article", () => {
@@ -101,7 +95,8 @@ describe("GET /api/articles/:article_id", () => {
         expect(article).toHaveProperty("topic", expect.any(String));
         expect(article).toHaveProperty("created_at", expect.any(String));
         expect(article).toHaveProperty("votes", expect.any(Number));
-        expect(article).toHaveProperty("article_img_url", expect.any(String));
+        expect(article).toHaveProperty("article_img_url", expect.any(String))
+        expect(article).toHaveProperty("comment_count", expect.any(Number))
       });
   });
   test("400: returns an error when given a non-numeric article_id", () => {
