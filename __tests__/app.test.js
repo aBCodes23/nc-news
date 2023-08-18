@@ -124,18 +124,17 @@ describe("GET /api/articles/:article_id", () => {
 });
 
 describe("GET /api/articles", () => {
+  const desiredArticle = {
+    author: expect.any(String),
+    title: expect.any(String),
+    article_id: expect.any(Number),
+    topic: expect.any(String),
+    created_at: expect.any(String),
+    votes: expect.any(Number),
+    article_img_url: expect.any(String),
+    comment_count: expect.any(Number),
+  };
   test("200: returns an array of article objects with the correct properties", () => {
-    const desiredArticle = {
-      author: expect.any(String),
-      title: expect.any(String),
-      article_id: expect.any(Number),
-      topic: expect.any(String),
-      created_at: expect.any(String),
-      votes: expect.any(Number),
-      article_img_url: expect.any(String),
-      comment_count: expect.any(String),
-    };
-
     return request(app)
       .get("/api/articles")
       .expect(200)
@@ -146,6 +145,141 @@ describe("GET /api/articles", () => {
         articles.forEach((article) => {
           expect(article).toMatchObject(desiredArticle);
         });
+      });
+  });
+  test("200 returns an array of articles filtered by [mitch], default sort (created_at) and default order (DESC)", () => {
+    desiredArticle.topic = "mitch";
+
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(12);
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+        articles.forEach((article) => {
+          expect(article).toMatchObject(desiredArticle);
+        });
+      });
+  });
+  test("200 returns an array of articles filtered by [mitch], default sort (created_at) and order [ASC]", () => {
+    desiredArticle.topic = "mitch";
+    return request(app)
+      .get("/api/articles?topic=mitch&order=ASC")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(12);
+        expect(articles).toBeSortedBy("created_at");
+        articles.forEach((article) => {
+          expect(article).toMatchObject(desiredArticle);
+        });
+      });
+    k;
+  });
+  test("200 returns an array of articles filtered by [cats], default sort (created_at) and default order (DESC)", () => {
+    desiredArticle.topic = "cats";
+
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(1);
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+        articles.forEach((article) => {
+          expect(article).toMatchObject(desiredArticle);
+        });
+      });
+  });
+  test("200 returns an array of articles (unfiltered) sorted by [votes] and default order (DESC)", () => {
+    desiredArticle.topic = expect.any(String);
+
+    return request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(13);
+        expect(articles).toBeSortedBy("votes", { descending: true });
+        articles.forEach((article) => {
+          expect(article).toMatchObject(desiredArticle);
+        });
+      });
+  });
+  test("200 returns an array of articles (unfiltered) sorted by [author] and order [ASC]", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author&order=ASC")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(13);
+        expect(articles).toBeSortedBy("author");
+        articles.forEach((article) => {
+          expect(article).toMatchObject(desiredArticle);
+        });
+      });
+  });
+  test("200 returns an array of articles filtered by [mitch] sorted by [title] and default order (DESC)", () => {
+    desiredArticle.topic = "mitch";
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=title")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(12);
+        expect(articles).toBeSortedBy("title", { descending: true });
+        articles.forEach((article) => {
+          expect(article).toMatchObject(desiredArticle);
+        });
+      });
+  });
+  test("200 returns an array of articles filtered by [mitch] sorted by [article_id] and order [ASC]", () => {
+    desiredArticle.topic = "mitch";
+
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=article_id&order=ASC")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(12);
+        expect(articles).toBeSortedBy("article_id");
+        articles.forEach((article) => {
+          expect(article).toMatchObject(desiredArticle);
+        });
+      });
+  });
+  test("200 returns an empty array when filtered by [paper] sorted by", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(0);
+      });
+  });
+  test("400 Not Found - Returns a custom error if topic is not permissible", () => {
+    return request(app)
+      .get("/api/articles?topic=pie&sort_by=article_id&order=ASC")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request: Invalid filter query");
+      });
+  });
+  test("400 Not Found - Returns a custom error if sort_by is not permissible", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=pie&order=ASC")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request: Invalid sort query");
+      });
+  });
+  test("400 Not Found - Returns a custom error if order is not permissible", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=article_id&order=pie")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request: Invalid order query");
       });
   });
 });
@@ -399,7 +533,7 @@ describe("GET /api/users", () => {
     const userObject = {
       username: expect.any(String),
       name: expect.any(String),
-      avatar_url: expect.any(String)
+      avatar_url: expect.any(String),
     };
     return request(app)
       .get("/api/users")
