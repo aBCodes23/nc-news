@@ -32,6 +32,7 @@ exports.readArticles = (topic, sort_by = "created_at", order = "DESC") => {
     "author",
     "body",
     "votes",
+    "comment_count"
   ];
 
   if (!orderByGreenList.includes(order)) {
