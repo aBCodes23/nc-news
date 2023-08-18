@@ -6,10 +6,6 @@ This project builds an API for the purpose of accessing application data program
 
 The hosted version is available on: https://abcodesnorthcodersncnewsapp.onrender.com/.
 
-## Database Set Up
-
-
-
 ## Set Up
 
 ### 1
