@@ -4,6 +4,7 @@ const {
   readArticles,
   updateArticleVotes,
 } = require("../models/articles.models");
+const {checkTopicExists} = require('../models/topics.models')
 
 exports.getArticle = (request, response, next) => {
   const { article_id } = request.params;
@@ -26,16 +27,16 @@ exports.getArticle = (request, response, next) => {
 exports.getArticles = (request, response, next) => {
   const { article_id } = request.params;
   const { topic } = request.query;
-  console.log(request.query, 'request query')
-  console.log(topic, 'topic in cont')
   const { sort_by } = request.query;
-  console.log(sort_by, 'sort by in cont')
   const { order } = request.query;
-  console.log(order, 'order in cont')
   const promises = [readArticles(topic, sort_by, order)];
 
   if (article_id) {
     promises.push(checkArticleExists(article_id));
+  }
+
+  if (topic){
+    promises.push(checkTopicExists(topic))
   }
 
   Promise.all(promises)
