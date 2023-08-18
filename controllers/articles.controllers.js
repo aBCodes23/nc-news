@@ -4,7 +4,7 @@ const {
   readArticles,
   updateArticleVotes,
 } = require("../models/articles.models");
-const {checkTopicExists} = require('../models/topics.models')
+const { checkTopicExists } = require("../models/topics.models");
 
 exports.getArticle = (request, response, next) => {
   const { article_id } = request.params;
@@ -17,7 +17,6 @@ exports.getArticle = (request, response, next) => {
   Promise.all(promises)
     .then((resolvedPromises) => {
       const article = resolvedPromises[0];
-      console.log(article)
       response.status(200).send({ article });
     })
     .catch((err) => {
@@ -36,8 +35,8 @@ exports.getArticles = (request, response, next) => {
     promises.push(checkArticleExists(article_id));
   }
 
-  if (topic){
-    promises.push(checkTopicExists(topic))
+  if (topic) {
+    promises.push(checkTopicExists(topic));
   }
 
   Promise.all(promises)
