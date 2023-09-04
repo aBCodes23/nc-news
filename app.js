@@ -10,8 +10,10 @@ const {
 const { getArticleComments, postComment, deleteComment } = require("./controllers/comments.controllers");
 const {getUsers} = require('./controllers/users.controllers')
 const { customErrorHandler } = require("./controllers/errors.controllers");
+const cors = require('cors')
 
 app.use(express.json());
+app.use(cors())
 
 app.get("/api/topics", getTopics);
 
